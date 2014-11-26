@@ -8,7 +8,6 @@ import com.cgi.service.customer.dto.CustomerType;
 import com.cgi.service.customer.dto.GetCustomerByNissRequestDTO;
 import com.cgi.service.customer.dto.GetCustomerByNissResponseDTO;
 import com.cgi.service.customer.dto.RegisterCustomerRequestDTO;
-import org.hamcrest.CoreMatchers;
 import org.jbehave.core.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,6 +19,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -31,6 +31,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @Component
 public class RegistrationSteps {
 
+    private static int MINIMAL_AGE = 18;
+
     @Autowired
     private CustomerService customerService;
 
@@ -40,35 +42,35 @@ public class RegistrationSteps {
     @Autowired
     private FaultContext faultContext;
 
-    @Given("the new visitor is $age years old.")
-    public void givenANewVisitorThatIdXYearsOld(@Named("age") int age) {
-        // Generate a Birth date based on the current date - $age.
-        customerContext.getCurrentCustomer().setBirthDate(generateBirthDate(age));
+    @Given("the visitor is minor")
+    public void givenAMinorVisitor() {
+        customerContext.getCurrentCustomer().setBirthDate(generateBirthDate(MINIMAL_AGE - 1));
     }
 
-    @Given("a new visitor that is not registered")
-    public void givenANewVisitorThatIsNotRegistered() {
+    @Given("a visitor that is not registered")
+    public void givenAVisitorThatIsNotRegistered() {
         // Create a customer with a Random National Number (UUID to make sure it stays unique)
-        // so that the test can be repeatedly run in the same environment.
+        // so that the test be repeatedly against the same environment.
         CustomerType customerType = createNewCustomer(UUID.randomUUID().toString());
         // Set this customer in the current context as it will be reused
         customerContext.setCurrentCustomer(customerType);
     }
 
     @Given("a customer already registered to the system")
-    @Composite(steps = {"Given a new visitor that is not registered",
-            "Given the new visitor is 18 years old.",
-            "When the visitor register to the service with its details"})
+    @Composite(steps = {
+            "Given a visitor that is not registered",
+            "When the visitor registers to the service with its details"})
     public void givenAVisitorAlreadyRegisteredToTheSystem() {
-        // The last added customer should be retrieved so that create a new customer with the same national Number µ
+        // The last added customer should be retrieved so that create a new customer with the same national Number
         // to generate the duplicate national number error.
         String currentNationalNumber = customerContext.getCurrentCustomer().getNiss();
         CustomerType customerType = createNewCustomer(currentNationalNumber);
         customerContext.setCurrentCustomer(customerType);
     }
 
-    @When("the visitor register to the service with its details")
-    public void whenThePersonRegister() {
+    @When("the visitor registers to the service with its details")
+    @Alias("the visitor registers again to the service with its details")
+    public void whenTheVisitorRegister() {
         // Get the current customer from the context.
         RegisterCustomerRequestDTO dto = new RegisterCustomerRequestDTO();
         dto.setCustomer(customerContext.getCurrentCustomer());
@@ -81,7 +83,7 @@ public class RegistrationSteps {
         }
     }
 
-    @Then("The new customer is successfully registered")
+    @Then("the new customer is successfully registered")
     public void thenTheNewCustomerIsSuccessfullyRegistered() {
         // Here we have to make sure that the customer present in the system and that the correct data has been stored.
         GetCustomerByNissRequestDTO request = new GetCustomerByNissRequestDTO();
@@ -90,6 +92,7 @@ public class RegistrationSteps {
         // Make sure that all fields have been persisted correctly according to what we have entered before
         // As our DTO does not have an equals method the fields must be tested one by one...
         CustomerType registeredCustomer = response.getCustomer();
+        assertNotNull(registeredCustomer);
         CustomerType contextCustomer = customerContext.getCurrentCustomer();
         assertThat(registeredCustomer.getFirstName(), is(contextCustomer.getFirstName()));
         assertThat(registeredCustomer.getLastName(), is(contextCustomer.getLastName()));
@@ -140,6 +143,7 @@ public class RegistrationSteps {
         customerType.setLastName("Last Name");
         customerType.setFirstName("First name");
         customerType.setNiss(nationalNumber);
+        customerType.setBirthDate(generateBirthDate(MINIMAL_AGE));
         return customerType;
     }
 }

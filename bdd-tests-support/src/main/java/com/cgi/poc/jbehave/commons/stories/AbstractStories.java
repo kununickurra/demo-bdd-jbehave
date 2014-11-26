@@ -4,6 +4,7 @@ import org.jbehave.core.Embeddable;
 import org.jbehave.core.configuration.Configuration;
 import org.jbehave.core.configuration.MostUsefulConfiguration;
 import org.jbehave.core.failures.FailingUponPendingStep;
+import org.jbehave.core.failures.RethrowingFailure;
 import org.jbehave.core.io.LoadFromClasspath;
 import org.jbehave.core.io.StoryFinder;
 import org.jbehave.core.junit.JUnitStories;
@@ -37,8 +38,6 @@ public abstract class AbstractStories extends JUnitStories {
     private final CrossReference crossReference;
 
     protected AbstractStories() {
-//        configuredEmbedder().embedderControls().doGenerateViewAfterStories(true).doIgnoreFailureInStories(false)
-//                .doIgnoreFailureInView(false).useThreads(1).useStoryTimeoutInSecs(60);
         crossReference = new CrossReference().withJsonOnly();
         crossReference.withOutputAfterEachStory(true);
         crossReference.excludingStoriesWithNoExecutedScenarios(false);
@@ -56,8 +55,8 @@ public abstract class AbstractStories extends JUnitStories {
         ParameterConverters parameterConverters = new ParameterConverters();
         parameterConverters.addConverters(new ParameterConverters.EnumConverter());
 
-        MostUsefulConfiguration configuration = new MostUsefulConfiguration();
-        configuration.useFailureStrategy(new FailingUponPendingStep());
+        MostUsefulConfiguration configuration = new MostUsefulConfiguration();;
+        configuration.usePendingStepStrategy(new FailingUponPendingStep());
         configuration.useStoryLoader(new LoadFromClasspath(embeddableClass));
         configuration.useStoryReporterBuilder(reporterBuilder);
         configuration.useParameterConverters(parameterConverters);

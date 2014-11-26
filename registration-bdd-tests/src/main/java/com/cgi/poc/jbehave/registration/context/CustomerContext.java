@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 /**
  * Storage class for the customer that allows to store and retrieve context information between steps execution
  * Note that, as steps can be run using multiple threads (configurable in Jbehave)
- * it is necessary to use a ThreadLocal variable.
+ * it is necessary to use a ThreadLocal variable or any other thread-safe solution
  */
 
 @Component
