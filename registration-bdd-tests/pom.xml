@@ -11,6 +11,10 @@
     <artifactId>registration-bdd-tests</artifactId>
     <dependencies>
         <dependency>
+            <groupId>com.cgi.poc.service</groupId>
+            <artifactId>customer-service-spec</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.cgi.poc</groupId>
             <artifactId>bdd-tests-support</artifactId>
         </dependency>
@@ -19,8 +23,8 @@
             <artifactId>jbehave-spring</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.cgi.poc</groupId>
-            <artifactId>customer-service-spec-server-jaxws</artifactId>
+            <groupId>org.jbehave</groupId>
+            <artifactId>jbehave-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -48,6 +52,46 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>unpack-jbehave-site-resources</id>
+                    <phase>generate-resources</phase>
+                    <goals>
+                        <goal>unpack</goal>
+                    </goals>
+                    <configuration>
+                        <artifactItems>
+                            <artifactItem>
+                                <groupId>org.jbehave.site</groupId>
+                                <artifactId>jbehave-site-resources</artifactId>
+                                <type>zip</type>
+                                <outputDirectory> ${project.build.directory}/jbehave/view</outputDirectory>
+                            </artifactItem>
+                        </artifactItems>
+                    </configuration>
+                </execution>
+                <execution>
+                    <id>unpack-jbehave-reports-resources</id>
+                    <phase>generate-resources</phase>
+                    <goals>
+                        <goal>unpack</goal>
+                    </goals>
+                    <configuration>
+                        <artifactItems>
+                            <artifactItem>
+                                <groupId>org.jbehave</groupId>
+                                <artifactId>jbehave-core</artifactId>
+                                <outputDirectory>${project.build.directory}/jbehave/view</outputDirectory>
+                                <includes>**\/*.css,**\/*.ftl,**\/*.js</includes>
+                            </artifactItem>
+                        </artifactItems>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
             <plugin>
                 <groupId>org.jbehave</groupId>
                 <artifactId>jbehave-maven-plugin</artifactId>

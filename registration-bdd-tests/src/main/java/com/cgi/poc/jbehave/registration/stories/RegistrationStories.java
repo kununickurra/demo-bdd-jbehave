@@ -27,9 +27,8 @@ import static org.jbehave.core.io.CodeLocations.codeLocationFromClass;
 import static org.jbehave.core.reporters.Format.*;
 
 /*
- * This class will allow to run the registration stories from IDE.
- * Simply run as Junit test!
+ * This class will allow to run the registration stories.
+ * Extends the {@link AbstractStories} that holds the default configuration to run the stories.
  */
 
-public class RegistrationStories extends AbstractStories {
-}
+public class RegistrationStories extends AbstractStories {}
