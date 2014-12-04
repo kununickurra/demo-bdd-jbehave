@@ -28,6 +28,7 @@ And the visitor enter a national number already registered
 When the visitor registers to the service with its details
 Then the visitor should receive an error message A consumer with the national number xxxx already exists
 
+
 Scenario: A minor visitor tries to register
 
 Meta:
